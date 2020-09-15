@@ -1,0 +1,21 @@
+﻿@inject EasyBilling.Services.AccessRightsManager arManager
+@{
+    var buttonName = (ViewData["ActionPage"].Equals("Create") ? "Добавить" : "Изменить");
+    var isAvailable = await arManager.GetExistRight(Context.User.Identity.Name, ViewData["ControllerName"] as string, ViewData["ActionName"] as string);
+}
+
+<div class="card p-3 m-2">
+    <form asp-action="@ViewData["ActionPage"]" method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
+
+        @await Html.PartialAsync("_AddUpdateFields")
+
+        <div class="form-group mt-3 mb-0 row justify-content-around">
+            @if (isAvailable)
+            {
+                <input type="submit" value="@buttonName" class="btn btn-raised btn-success" />
+            }
+            @Html.ActionLink("Назад", "Index", null, htmlAttributes: new { @class = "btn btn-info" })
+        </div>
+    </form>
+</div>

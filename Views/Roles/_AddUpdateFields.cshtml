@@ -1,0 +1,34 @@
+﻿@model EasyBilling.Models.Pocos.Role
+@using EasyBilling.Helpers
+@inject EasyBilling.Data.BillingDbContext dbContext
+
+@{
+    var cntrlsNames = dbContext.ControllersNames.ToArray();
+}
+
+<input asp-for="Id" type="hidden" class="form-control" />
+
+<div class="mb-0 form-group">
+    <label asp-for="Name" class="text-info">Название</label>
+    <input asp-for="Name" class="form-control" required />
+    <span asp-validation-for="Name" class="text-danger"></span>
+</div>
+
+<div class="mb-0 form-group">
+    <label asp-for="LocalizedName" class="text-info"></label>
+    <input asp-for="LocalizedName" class="form-control" required />
+    <span asp-validation-for="LocalizedName" class="text-danger"></span>
+</div>
+
+<div class="mb-0 form-group">
+    <label asp-for="DefaultControllerName" class="text-info"></label>
+    <select class="mt-2 custom-select form-control" asp-for="DefaultControllerName.Name">
+        @foreach (var item in dbContext.ControllersNames)
+        {
+            <option value="@item.Name" selected="@(item.Name.Equals(Model.DefaultControllerName.Name))">
+                @item.LocalizedName
+            </option>
+        }
+    </select>
+    <span asp-validation-for="DefaultControllerName" class="text-danger"></span>
+</div>

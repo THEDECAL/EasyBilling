@@ -1,0 +1,23 @@
+﻿@inject EasyBilling.Services.AccessRightsManager arManager
+
+@{
+    var isCreateAvailable = await arManager.GetExistRight(Context.User.Identity.Name, ViewData["ControllerName"] as string, ViewData["ActionName"] as string);
+}
+
+<div class="card p-3 m-2">
+    @await Model.TableHelper.GetControlPanelAsync(isCreateAvailable)
+    @if (Model.Data.Count > 0)
+    {
+        <table class="table table-striped table-sm">
+            @await Model.TableHelper.GetTableHeadAsync()
+            <tbody>
+                @await Html.PartialAsync("_TableData")
+            </tbody>
+        </table>
+        @await Model.TableHelper.GetPaginationPanelAsync()
+    }
+    else
+    {
+        <h3 class="m-5 btn btn-raised btn-lg btn-dark text-center">Не найдено ни одного элемента...</h3>
+    }
+</div>

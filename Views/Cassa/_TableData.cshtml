@@ -1,0 +1,33 @@
+﻿@{
+    int counter = 1;
+    @foreach (Dictionary<string, string> row in await Model.GetDataDicAsync())
+    {
+        <tr class="text-center">
+            <td class="align-middle">@counter</td>
+            @foreach (var field in row)
+            {
+                @if (!field.Key.Equals("Id"))
+                {
+                    <td class="align-middle">
+                        @if (field.Value.Equals("False") || field.Value.Equals("True"))
+                        {
+                            var color = (field.Value.Equals("True") ? "badge-success" : "badge-danger");
+                            <a href="#" class="badge @color p-2 m-1">@field.Value</a>
+                        }
+                        else
+                        {
+                            @field.Value
+                        }
+                    </td>
+                }
+            }
+
+            <td class="align-middle">
+                <a class='btn btn-info btn-sm btn-raised' href='/Cassa/AddUpdateForm/@row["Id"]'>
+                    Внести оплату
+                </a>
+            </td>
+        </tr>
+        counter++;
+    }
+}

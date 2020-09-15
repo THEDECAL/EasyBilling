@@ -1,0 +1,57 @@
+﻿@{
+    int counter = 1;
+    var list = await Model.GetDataDicAsync();
+    @foreach (Dictionary<string, string> row in list)
+    {
+        <tr class="text-center">
+            <td class="align-middle">@counter</td>
+            @foreach (var field in row)
+            {
+                @if (!field.Key.Equals("Id"))
+                {
+                    <td class="align-middle">
+                        @if (field.Key.Equals("RigthsString"))
+                        {
+                            var arrayRights = field.Value.Split(';');
+                            @foreach (var right in arrayRights)
+                            {
+                                @if (!string.IsNullOrWhiteSpace(right))
+                                {
+                                    <a href="#" class="badge badge-pill badge-secondary p-2 m-1">@right</a>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            @if (field.Value.Equals("False") || field.Value.Equals("True"))
+                            {
+                                var color = (field.Value.Equals("True") ? "badge-success" : "badge-danger");
+                                <a href="#" class="badge @color p-2 m-1">@field.Value</a>
+                            }
+                            else
+                            {
+                                @field.Value
+                            }
+                        }
+                    </td>
+                }
+            }
+
+            <td class="align-middle">
+                <form method="post" asp-action="Delete" class="m-0 form-inline">
+                    <input type="hidden" value="@row["Id"]" name="id" />
+
+                    <span class="btn-group" style="margin: 0 auto;">
+                        <a class="btn btn-primary bmd-btn-fab circle-btn" href="/@ViewData["ControllerName"]/AddUpdateForm/@row["Id"]" title="Изменить">
+                            <img src="/images/edit-icon.svg" style="margin: 3px 0;">
+                        </a>
+                        <button type="submit" class="btn btn-danger bmd-btn-fab circle-btn" title="Удалить">
+                            <img src="/images/delete-icon.svg" />
+                        </button>
+                    </span>
+                </form>
+            </td>
+        </tr>
+        counter++;
+    }
+}

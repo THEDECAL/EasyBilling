@@ -1,0 +1,118 @@
+﻿@using EasyBilling.Helpers
+@model EasyBilling.Models.Pocos.Device
+@inject EasyBilling.Data.BillingDbContext dbContext
+
+<input asp-for="Id" type="hidden" class="form-control" />
+
+<div class="form-group">
+    <div class="form-row">
+        <div class="col">
+            <div class="form-group">
+                <label asp-for="Name" class="text-info"></label>
+                <input asp-for="Name" type="text" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label asp-for="Type" class="text-info"></label>
+                <select class="mt-2 custom-select form-control" asp-for="Type.Name">
+                    @foreach (var item in dbContext.DeviceTypes.ToArray())
+                    {
+                        <option value="@item.Name" selected="@(Model.Type != null && item.Name.Equals(Model.Type.Name))">
+                            @item.LocalizedName
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label asp-for="State" class="text-info"></label>
+                <select class="mt-2 custom-select form-control" asp-for="State.Name">
+                    @foreach (var item in dbContext.DeviceStates.ToArray())
+                    {
+                        <option value="@item.Name" selected="@(Model.State != null && item.Name.Equals(Model.State.Name))">
+                            @item.LocalizedName
+                        </option>
+                    }
+                </select>
+                <span asp-validation-for="State" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="col">
+            <div class="form-group">
+                <label asp-for="SerialNumber" class="text-info"></label>
+                <input asp-for="SerialNumber" type="text" class="form-control" required />
+                <span asp-validation-for="SerialNumber" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label asp-for="Brand" class="text-info"></label>
+                <input asp-for="Brand" class="form-control" />
+                <span asp-validation-for="Brand" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label asp-for="Model" class="text-info"></label>
+                <input asp-for="Model" class="form-control" />
+                <span asp-validation-for="Model" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="col">
+            <div class="form-group">
+                <label asp-for="Location" class="text-info"></label>
+                <input asp-for="Location" type="text" class="form-control" required />
+                <span asp-validation-for="Location" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label asp-for="MAC" class="text-info"></label>
+                <input asp-for="MAC" class="form-control" />
+                <span asp-validation-for="MAC" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label asp-for="IP" class="text-info"></label>
+                <input asp-for="IP" class="form-control" />
+                <span asp-validation-for="IP" class="text-danger"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="col">
+            <div class="form-group">
+                <label class="text-info">@await CustomFieldsHelper.GetCustomFieldNameAsync(nameof(Model.CustomDeviceField1))</label>
+                <input asp-for="CustomDeviceField1" class="form-control" />
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-group">
+                <label class="text-info">@await CustomFieldsHelper.GetCustomFieldNameAsync(nameof(Model.CustomDeviceField2))</label>
+                <input asp-for="CustomDeviceField2" class="form-control" />
+            </div>
+        </div>
+        <div class="col">
+            <label class="text-info">@await CustomFieldsHelper.GetCustomFieldNameAsync(nameof(Model.CustomDeviceField3))</label>
+            <input asp-for="CustomDeviceField3" class="form-control" />
+        </div>
+    </div>
+</div>
+
+<div class="form-group">
+    <label asp-for="Comment" class="text-info"></label>
+    <textarea asp-for="Comment" class="form-control"></textarea>
+    <span asp-validation-for="Comment" class="text-danger"></span>
+</div>

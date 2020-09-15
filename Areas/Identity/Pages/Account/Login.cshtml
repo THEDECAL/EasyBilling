@@ -1,0 +1,42 @@
+﻿@page
+@model LoginModel
+
+@{
+    ViewData["Title"] = "Авторизация";
+}
+
+<link rel="stylesheet" href="~/css/form.css" />
+
+<form class="form form-auth card" method="post" asp-antiforgery="true">
+    <div class="text-center">
+        <img class="m-3" src="/images/easy-billing-icon.svg" alt="..." width="100" height="100">
+        <h1 class="h4 font-weight-normal">@ViewData["Title"]</h1>
+    </div>
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="Input.Login" class="bmd-label-floating"></label>
+        <input asp-for="Input.Login" type="text" class="form-control" required autofocus>
+        <span asp-validation-for="Input.Login" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Input.Password" class="bmd-label-floating"></label>
+        <input asp-for="Input.Password" type="password" class="form-control" required>
+        <span asp-validation-for="Input.Password" class="text-danger"></span>
+    </div>
+    <div class="form-group m-2 row justify-content-between">
+        <div class="switch">
+            <label asp-for="Input.RememberMe">
+                <input asp-for="Input.RememberMe" type="checkbox" />
+                @Html.DisplayNameFor(m => m.Input.RememberMe)
+            </label>
+        </div>
+        <a class="btn btn-default btn-sm" id="forgot-password" asp-page="./ForgotPassword">Напомнить пароль</a>
+    </div>
+
+    <a class="btn btn-sm" id="resend-confirmation" asp-page="./ResendEmailConfirmation">Повторно выслать подтверждение почты</a>
+
+    <button class="mt-2 btn btn-raised btn-success btn-block" type="submit">Войти</button>
+
+    <p class="mt-5 mb-3 text-muted text-center">&copy; 2020 - EasyBilling</p>
+</form>

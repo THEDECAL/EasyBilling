@@ -1,0 +1,27 @@
+﻿@{
+    int counter = 1;
+    @foreach (Dictionary<string, string> row in await Model.GetDataDicAsync())
+    {
+        <tr class="text-center">
+            <td class="align-middle">@counter</td>
+            @foreach (var field in row)
+            {
+                @if (!field.Key.Equals("Id"))
+                {
+                    <td class="align-middle">@field.Value</td>
+                }
+            }
+
+            <td class="align-middle">
+                <form asp-antiforgery="true" method="post" asp-action="Delete" class="m-0 form-inline">
+                    <input type="hidden" value="@row["Id"]" name="id" />
+
+                    <button type="submit" class="m-1 btn btn-danger bmd-btn-fab circle-btn">
+                        <img src="/images/delete-icon.svg" />
+                    </button>
+                </form>
+            </td>
+        </tr>
+        counter++;
+    }
+}

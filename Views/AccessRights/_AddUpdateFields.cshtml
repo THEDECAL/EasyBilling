@@ -1,0 +1,89 @@
+﻿@model EasyBilling.Models.Pocos.AccessRight
+@using EasyBilling.Helpers
+@inject Microsoft.AspNetCore.Identity.RoleManager<EasyBilling.Models.Pocos.Role> roleManager
+@inject EasyBilling.Data.BillingDbContext dbContext
+
+@{
+    var cntrlsNames = dbContext.ControllersNames.ToArray();
+}
+
+<input asp-for="Id" type="hidden" class="form-control" />
+
+<div class="mb-0 form-group">
+    <label asp-for="Role" class="text-info"></label>
+    <select class="mt-2 custom-select form-control" asp-for="Role.Name">
+        @foreach (var item in roleManager.Roles.ToArray())
+        {
+            <option value="@item.Name" selected="@(Model.Role.Name != null && Model.Role.Name.Equals(item.Name))">
+                @item.LocalizedName
+            </option>
+        }
+    </select>
+    <span asp-validation-for="Role" class="text-danger"></span>
+</div>
+
+<div class="form-group">
+    <label asp-for="Controller" class="text-info"></label>
+    <select class="mt-2 custom-select form-control" asp-for="Controller.Name">
+        @foreach (var item in cntrlsNames)
+        {
+            <option value="@item.Name" selected="@(Model.Controller != null && item.Name.Equals(Model.Controller.Name))">
+                @item.LocalizedName
+            </option>
+        }
+    </select>
+    <span asp-validation-for="Controller.Name" class="text-danger"></span>
+</div>
+
+<div class="mb-0 form-group">
+    <label asp-for="Rights" class="text-info"></label>
+    @{
+        var i = 0;
+        var slctCntrl = cntrlsNames.FirstOrDefault(c => c.Name.Equals(Model.Controller.Name));
+        var slctIdx = (slctCntrl == null)
+            ? 0
+            : Array.IndexOf(cntrlsNames, slctCntrl);
+    }
+    @foreach (var cntrl in cntrlsNames)
+    {
+        bool isSelectedController = Model.Controller.Name.Equals(cntrl.Name);
+        var actionsRights = isSelectedController ? Model.Rights
+            : await ControllerHelper.GetActionsRightsAsync(cntrl.Name);
+        var displayStyle = (slctIdx == i) ? "block" : "none";
+        var chboxTag = (slctIdx == i) ? "rights" : "hidden-rights";
+
+        <div class="mt-2" id="_@cntrl.Name" style="display: @displayStyle">
+            @{  
+                var j = 0;
+            }
+            @foreach (var action in actionsRights)
+            {
+                <div class="checkbox">
+                    <label>
+                        @Html.CheckBox(chboxTag + $"[{j}]", action.IsAvailable)
+                        @action.LocalizedName
+                    </label>
+                </div>
+                j++;
+            }
+        </div>
+        i++;
+    }
+    <span asp-validation-for="Rights" class="text-danger"></span>
+</div>
+
+<div class="m-0 py-3 form-group">
+    <div class="switch">
+        <label class="form-check-label">
+            Запрещено
+        </label>
+        <label class="form-check-label">
+            @{
+                string chk = (Model.IsAvailable) ? "checked" : "";
+                <input class="form-control" type="checkbox" asp-for="IsAvailable" chk />
+            }
+            Разрешено
+        </label>
+        <span asp-validation-for="IsAvailable" class="text-danger"></span>
+    </div>
+</div>

@@ -1,0 +1,182 @@
+﻿@inject EasyBilling.Data.BillingDbContext dbContext
+@model (EasyBilling.ViewModels.DataViewModel<EasyBilling.Models.Pocos.Payment> dvm, EasyBilling.Models.Pocos.Profile profile)
+
+@{
+    var speedConvert = new Func<int, string>((n) => (n >= 1000) ? n / 1000 + " Мбит" : " Кбит");
+    var trafficConvert = new Func<int, string>((n) => (n >= 1024) ? n / 1024 + " Мбайт" : " Кбайт");
+}
+
+<div class="container row justify-content-around" style="width: 100%;">
+    <div class="card p-3 m-2" style="max-height: 380px">
+        <div>
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group mb-0">
+                        <label asp-for="profile.Account.UserName" class="text-info">Логин</label>
+                        <input asp-for="profile.Account.UserName" type="text" class="form-control bg-white" readonly />
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group mb-0">
+                        <label asp-for="profile.Account.Email" class="text-info">Электронная почта</label>
+                        <input asp-for="profile.Account.Email" type="text" class="form-control bg-white" readonly />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="col">
+                    <div class="form-group mb-0">
+                        <label asp-for="profile.FirstName" class="text-info"></label>
+                        <input asp-for="profile.FirstName" type="text" class="form-control bg-white" readonly />
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group mb-0">
+                        <label asp-for="profile.SecondName" class="text-info"></label>
+                        <input asp-for="profile.SecondName" type="text" class="form-control bg-white" readonly />
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.profile.Patronymic))
+        {
+            <div class="form-group mb-0">
+                <label asp-for="profile.Patronymic" class="text-info"></label>
+                <input asp-for="profile.Patronymic" class="form-control bg-white" readonly />
+            </div>
+        }
+
+        <div class="form-group mb-0">
+            <label asp-for="profile.Address" class="text-info"></label>
+            <input asp-for="profile.Address" class="form-control bg-white" readonly />
+        </div>
+
+        @if (Model.profile.Tariff.AmountOfTraffic != 0)
+        {
+            <div class="form-group mb-0">
+                <label asp-for="profile.UsedTraffic" class="text-info"></label>
+                <input type="text" class="form-control bg-white" readonly value="@(Model.profile.UsedTraffic)/@(Model.profile.Tariff.AmountOfTraffic) Кбайт" />
+            </div>
+        }
+
+        <div class="form-group">
+            <label asp-for="profile.AmountOfCash" class="text-info"></label>
+            <input asp-for="profile.AmountOfCash" type="text" class="form-control" style="direction: rtl; padding: 10px; font-size: 1.5rem; text-align: center;" readonly />
+        </div>
+
+        <div class="row justify-content-center">
+            <form class="mb-0" method="post" asp-action="ChnageHoldState" id="hold-state">
+                <input name="profileId" type="hidden" value="@Model.profile.Id" />
+                <button class="btn btn-raised @(Model.profile.IsHolded ? "btn-success" : "btn-info")" form="hold-state" type="submit">
+                    @(Model.profile.IsHolded ? "Разморозить" : "Заморозить")
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="accordion" class="p-3 m-2">
+        @foreach (var item in dbContext.Tariffs.Where(t => t.IsPublish).ToArray())
+        {
+            bool isCurrTariff = Model.profile.Tariff.Id.Equals(item.Id);
+
+            <div class="card">
+                <div id="heading@(item.Id)" class="card-header">
+                    <form method="post" asp-action="ChangeTariff">
+                        <h5 class="m-0 row justify-content-between">
+                            <button type="button" data-toggle="collapse" data-target="#collapse@(item.Id)" aria-expanded="@isCurrTariff.ToString().ToLower()" aria-controls="collapseOne" class="btn collapsed">
+                                @item.Name&nbsp;
+                                @if (isCurrTariff)
+                                {<span class="badge badge-success">Ваш тариф</span>}
+                            </button>
+                            @if (!isCurrTariff)
+                            {
+                                <input type="hidden" name="tariffId" value="@item.Id" />
+                                <input type="hidden" name="profileId" value="@Model.profile.Id" />
+                                <button type="submit" class="btn btn-sm btn-info btn-raised">Сменить тариф</button>
+                            }
+                        </h5>
+                    </form>
+                </div>
+
+                <div id="collapse@(item.Id)" class="collapse" aria-labelledby="heading@(item.Id)" data-parent="#accordion" style="">
+                    <div class="card-body">
+                        <div>
+                            <div class="form-row">
+                                <div class="col">
+                                    <div class="form-group mb-0">
+                                        <label class="text-info" asp-for="profile.Tariff.Price"></label>
+                                        <input class="form-control" value="@(item.Price)" type="text" readonly style="font-size: 1.5rem; padding: 5px; text-align: center;" />
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group mb-0">
+                                        <label class="text-info" asp-for="profile.Tariff.AmounfOfDays"></label>
+                                        <input class="form-control bg-white" value="@(item.AmounfOfDays)" type="text" readonly />
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col">
+                                    <div class="form-group mb-0">
+                                        <label class="text-info" asp-for="profile.Tariff.BandwidthInput">Входящая скорость</label>
+                                        <input class="form-control bg-white" value="@speedConvert(item.BandwidthInput)" type="text" readonly />
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-group mb-0">
+                                        <label class="text-info" asp-for="profile.Tariff.BandwidthOutput">Исходящая скорость</label>
+                                        <input class="form-control bg-white" value="@speedConvert(item.BandwidthOutput)" type="text" readonly />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @if (item.AmountOfTraffic != 0)
+                        {
+                            <div class="form-group mb-0">
+                                <label class="text-info" asp-for="profile.Tariff.AmountOfTraffic">Объём трафика</label>
+                                <input class="form-control bg-white" value="@trafficConvert(item.AmountOfTraffic)" type="text" readonly />
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="card p-3 m-2">
+    @await Model.dvm.TableHelper.GetControlPanelAsync(false)
+    @if (Model.dvm.Data.Count > 0)
+    {
+        <table class="table table-striped table-sm">
+            @await Model.dvm.TableHelper.GetTableHeadAsync(false)
+            <tbody>
+                @{
+                    int counter = 1;
+                    var list = await Model.dvm.GetDataDicAsync();
+                    @foreach (Dictionary<string, string> row in list)
+                    {
+                        <tr class="text-center">
+                            <td class="align-middle">@counter</td>
+                            @foreach (var field in row)
+                            {
+                                @if (!field.Key.Equals("Id"))
+                                {
+                                    <td class="align-middle">@field.Value</td>
+                                }
+                            }
+                        </tr>
+                        counter++;
+                    }
+                }
+            </tbody>
+        </table>
+        @await Model.dvm.TableHelper.GetPaginationPanelAsync()
+    }
+    else
+    {
+        <h3 class="m-5 btn btn-raised btn-lg btn-dark text-center">Не найдено ни одного элемента...</h3>
+    }
+</div>

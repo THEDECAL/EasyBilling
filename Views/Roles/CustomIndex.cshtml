@@ -1,0 +1,73 @@
+﻿<div class="card p-3 m-2">
+    @await Model.TableHelper.GetControlPanelAsync()
+    @if (Model.Data.Count > 0)
+    {
+        <table class="table table-striped table-sm">
+            <thead>
+                <tr class="table-dark text-center">
+                    <th scope="col">
+                        <a class="text-white btn btn-link btn-sm sort-field" href="@Context.Request.Path" value="Id">
+                            #
+                        </a>
+                    </th>
+                    <th scope="col">
+                        <a class="text-white btn btn-link btn-sm sort-field" href="@Context.Request.Path" value="Name">
+                            Название
+                        </a>
+                    </th>
+                    <th scope="col">
+                        <a class="text-white btn btn-link btn-sm sort-field" href="@Context.Request.Path" value="LocalizedName">
+                            Локализированное имя
+                        </a>
+                    </th>
+                    <th scope="col">
+                        <a class="text-white btn btn-link btn-sm sort-field" href="@Context.Request.Path" value="DefaultControllerName">
+                            Страница по умолчанию
+                        </a>
+                    </th>
+                    <th scope="col">
+                        <a class="text-white btn btn-link btn-sm sort-field">
+                            Действия
+                        </a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int counter = 1;
+                    var list = await Model.GetDataDicAsync();
+                    @foreach (Dictionary<string, string> row in list)
+                    {
+                        <tr class="text-center">
+                            <td class="align-middle">@counter</td>
+                            <td class="align-middle">@row["Name"]</td>
+                            <td class="align-middle">@row["LocalizedName"]</td>
+                            <td class="align-middle">@row["DefaultControllerName"]</td>
+
+                            <td class="align-middle">
+                                <form method="post" asp-action="Delete" class="m-0 form-inline">
+                                    <input type="hidden" value="@row["Id"]" name="id" />
+
+                                    <span class="btn-group" style="margin: 0 auto;">
+                                        <a class="btn btn-primary bmd-btn-fab circle-btn" href="/@ViewData["ControllerName"]/AddUpdateForm/@row["Id"]" title="Изменить">
+                                            <img src="/images/edit-icon.svg" style="margin: 3px 0;">
+                                        </a>
+                                        <button type="submit" class="btn btn-danger bmd-btn-fab circle-btn" title="Удалить">
+                                            <img src="/images/delete-icon.svg" />
+                                        </button>
+                                    </span>
+                                </form>
+                            </td>
+                        </tr>
+                        counter++;
+                    }
+                }
+            </tbody>
+        </table>
+        @await Model.TableHelper.GetPaginationPanelAsync()
+    }
+    else
+    {
+        <h3 class="m-5 btn btn-raised btn-lg btn-dark text-center">Не найдено ни одного элемента...</h3>
+    }
+</div>
